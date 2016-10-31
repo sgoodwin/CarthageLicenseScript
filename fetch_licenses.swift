@@ -74,7 +74,19 @@ if CommandLine.arguments.count == 3 {
         let entries = parseResolvedCartfile(contents: content)
         let licenses = entries.map { ["title": $0.projectName, "text": $0.fetchLicense(outputDir: outputDirectory)] }
         let fileName = (outputDirectory as NSString).appendingPathComponent("Licenses.plist")
-        (licenses as NSArray).write(toFile: fileName, atomically: true)
+
+          var lines = [String]()
+
+          for entry in licenses {
+            guard let title = (entry["title"] as String?), let text = (entry["text"] as String?) else {
+              continue
+            }
+            lines.append(title)
+            lines.append(text)
+          }
+
+        try! lines.joined(separator: "\n").write(toFile: fileName, atomically: true, encoding: .utf8)
+
         print("Super awesome! Your licenses are at \(fileName) 🍻")
     } catch {
         print(error)
